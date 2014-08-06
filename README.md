@@ -7,5 +7,9 @@ Notifications of Deletes/Writes to this stream are pushed to Csync2 to distribut
 
 Requires:
 - php 5.5
-- Csync2
-- Csync2's database *folder* (/var/lib/csync2/) must be writeable by the user php is running under.
+- Csync2 1.34
+- Csync2's sqlite database *folder* (/var/lib/csync2/) must be writeable by the user php is running under.
+    - Don't sync the database!
+
+    mkdir /var/lib/csync2
+    chown php-user:php-user /var/lib/csync2

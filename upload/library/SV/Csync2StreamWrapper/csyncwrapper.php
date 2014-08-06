@@ -13,7 +13,7 @@ class SV_Csync2StreamWrapper_csyncwrapper
      
     public static function RegisterStream()
     {
-        global $csync2_deferred_count, $csync2_deferred_commit_bulk, $deferred_paths, $deferred_files, $csyncwrapper_debug_log;
+        global $csync2_deferred_count, $csync2_deferred_commit_bulk, $deferred_paths, $deferred_files, $csyncwrapper_debug_log, $csyncwrapper_database;
         //setlocale(LC_CTYPE, "en_US.UTF-8");
         stream_wrapper_register(self::prefix, "SV_Csync2StreamWrapper_csyncwrapper");
         
@@ -22,6 +22,7 @@ class SV_Csync2StreamWrapper_csyncwrapper
         $deferred_paths = array();
         $deferred_files =  array();
         //$csyncwrapper_debug_log = "/var/www/html/error.log";
+        //$csyncwrapper_database = "/var/lib/csync2";
     }
    
     protected static function absolutePath($path)
@@ -117,7 +118,7 @@ class SV_Csync2StreamWrapper_csyncwrapper
     
     protected static function ConsiderFileOrDir($path,$is_path)
     {
-        global $csync2_deferred_count, $csync2_deferred_commit_bulk, $deferred_files, $deferred_paths, $csyncwrapper_debug_log;
+        global $csync2_deferred_count, $csync2_deferred_commit_bulk, $deferred_files, $deferred_paths, $csyncwrapper_debug_log, $csyncwrapper_database;
         if ($csync2_deferred_count > 0)
         {
             if (!$csync2_deferred_commit_bulk)
@@ -136,6 +137,8 @@ class SV_Csync2StreamWrapper_csyncwrapper
             $flags = "m" ;
         if (isset($csyncwrapper_debug_log) && $csyncwrapper_debug_log)
             $flags .= "v"; 
+        if (isset($csyncwrapper_database) && $csyncwrapper_database)
+            $flags .= " -D ".$csyncwrapper_database;
         $input = self::csync2 . " -".$flags." " . $path ." 2>&1";
         $output = shell_exec($input);
         
@@ -148,7 +151,7 @@ class SV_Csync2StreamWrapper_csyncwrapper
     
     protected static function CommitChanges($bulk = false)
     {    
-        global $csync2_deferred_count,$csyncwrapper_debug_log;
+        global $csync2_deferred_count,$csyncwrapper_debug_log, $csyncwrapper_database;
         if ($csync2_deferred_count  > 0)
             return;
         
@@ -158,6 +161,8 @@ class SV_Csync2StreamWrapper_csyncwrapper
             $flags = "ur" ;
         if (isset($csyncwrapper_debug_log) && $csyncwrapper_debug_log)
             $flags .= "v";     
+        if (isset($csyncwrapper_database) && $csyncwrapper_database)
+            $flags .= " -D ".$csyncwrapper_database;           
         $input = self::csync2 . " -".$flags ." 2>&1";
         $output = shell_exec($input);
         
