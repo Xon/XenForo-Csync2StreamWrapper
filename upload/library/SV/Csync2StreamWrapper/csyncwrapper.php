@@ -328,7 +328,7 @@ class SV_Csync2StreamWrapper_csyncwrapper
                 $ret = chgrp($path, $value);
                 break;  
             case STREAM_META_ACCESS:
-                $ret = touch($path, $value);
+                $ret = chmod($path, $value);
                 break;             
             default:                
                 throw new Exception("SV_Csync2StreamWrapper_csyncwrapper::stream_metadata ". $option ." not implemented");
