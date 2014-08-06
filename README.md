@@ -9,6 +9,8 @@ Requires:
 - php 5.5
 - Csync2 1.34
 - Csync2's sqlite database *folder* (/var/lib/csync2/) must be writeable by the user php is running under.
-    - Don't sync the database!
+    - chown php-user:php-user /var/lib/csync2
+    - php-user also requires access to the key file for the group sync config.
+- Don't sync the sqlite database!
+    
 
-    chown php-user:php-user /var/lib/csync2
