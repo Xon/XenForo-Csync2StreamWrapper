@@ -11,5 +11,4 @@ Requires:
 - Csync2's sqlite database *folder* (/var/lib/csync2/) must be writeable by the user php is running under.
     - Don't sync the database!
 
-    mkdir /var/lib/csync2
     chown php-user:php-user /var/lib/csync2
