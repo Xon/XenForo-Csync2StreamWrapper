@@ -9,6 +9,7 @@
   <code_event_listeners>
     <listener event_id="init_dependencies" execute_order="10" callback_class="SV_Csync2StreamWrapper_Listener" callback_method="init_dependencies" active="1" hint="" description="Enable csync2://"/>
     <listener event_id="load_class_model" execute_order="10" callback_class="SV_Csync2StreamWrapper_Listener" callback_method="load_class_model" active="1" hint="XenForo_Model_Template" description="Speed up bulk template changes"/>
+    <listener event_id="load_class_model" execute_order="10" callback_class="SV_Csync2StreamWrapper_Listener" callback_method="load_class_model" active="1" hint="XenForo_Model_Avatar" description="Reduce chatter for updating avatars"/>
   </code_event_listeners>
   <cron/>
   <email_templates/>

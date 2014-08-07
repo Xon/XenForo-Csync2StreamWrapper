@@ -15,6 +15,9 @@ class SV_Csync2StreamWrapper_Listener
             case 'XenForo_Model_Template':
                 $extend[] = 'SV_Csync2StreamWrapper_Model_Template';
                 break;
+            case 'XenForo_Model_Avatar':
+                $extend[] = 'SV_Csync2StreamWrapper_Model_Avatar';
+                break;
         }
 
 	}    

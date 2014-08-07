@@ -1,5 +1,24 @@
 <?php
    
+function generateCallTrace()
+{
+    $e = new Exception();
+    $trace = explode("\n", $e->getTraceAsString());
+    // reverse array to make steps line up chronologically
+    $trace = array_reverse($trace);
+    array_shift($trace); // remove {main}
+    array_pop($trace); // remove call to this method
+    $length = count($trace);
+    $result = array();
+    
+    for ($i = 0; $i < $length; $i++)
+    {
+        $result[] = ($i + 1)  . ')' . substr($trace[$i], strpos($trace[$i], ' ')); // replace '#someNum' with '$i)', set the right ordering
+    }
+    
+    return "\t" . implode("\n\t", $result);
+}
+   
 class SV_Csync2StreamWrapper_csyncwrapper   
 {
 
@@ -131,10 +150,7 @@ class SV_Csync2StreamWrapper_csyncwrapper
             return;
         }
         // csync2 directly inspects the argc passed to the process and ignores shell expansions, so escaping doesn't work
-        if ($is_path)
-            $flags = "cr" ;
-        else
-            $flags = "m" ;
+        $flags = "cr" ;
         if (isset($csyncwrapper_debug_log) && $csyncwrapper_debug_log)
             $flags .= "v"; 
         if (isset($csyncwrapper_database) && $csyncwrapper_database)
@@ -144,6 +160,7 @@ class SV_Csync2StreamWrapper_csyncwrapper
         
         if (isset($csyncwrapper_debug_log) && $csyncwrapper_debug_log)
         {
+            file_put_contents($csyncwrapper_debug_log,generateCallTrace()."\n", FILE_APPEND);
             file_put_contents($csyncwrapper_debug_log,$input."\n", FILE_APPEND);
             file_put_contents($csyncwrapper_debug_log,$output."\n", FILE_APPEND);
         }
@@ -168,6 +185,7 @@ class SV_Csync2StreamWrapper_csyncwrapper
         
         if (isset($csyncwrapper_debug_log) && $csyncwrapper_debug_log)
         {        
+            file_put_contents($csyncwrapper_debug_log,generateCallTrace()."\n", FILE_APPEND);
             file_put_contents($csyncwrapper_debug_log,$input."\n", FILE_APPEND);
             file_put_contents($csyncwrapper_debug_log,$output."\n", FILE_APPEND);        
         }
@@ -279,7 +297,7 @@ class SV_Csync2StreamWrapper_csyncwrapper
     public function stream_close (  )
     {
         $ret = fclose($this->streamhandle);
-        if ($ret && $this->fileRequiresUpdate)
+        if ($this->fileRequiresUpdate)
         {
             self::ConsiderFileOrDir($this->parsedPath, false);
             self::CommitChanges();            
@@ -334,11 +352,7 @@ class SV_Csync2StreamWrapper_csyncwrapper
                 throw new Exception("SV_Csync2StreamWrapper_csyncwrapper::stream_metadata ". $option ." not implemented");
                 break;
         }
-        if ($ret)
-        {
-            self::ConsiderFileOrDir($path, is_dir($path));
-            self::CommitChanges();
-        }
+        $this->fileRequiresUpdate = false;
     }
     
     public function stream_open ( $path , $mode , $options , &$opened_path )
@@ -417,11 +431,8 @@ class SV_Csync2StreamWrapper_csyncwrapper
             return False;
         $is_dir = is_dir($path);
         $ret = @unlink($path);
-        if ($ret)
-        {
-            self::ConsiderFileOrDir($path, $is_dir);
-            self::CommitChanges();
-        }
+        self::ConsiderFileOrDir($path, $is_dir);
+        self::CommitChanges();
         return $ret;
     }
 
