@@ -87,7 +87,7 @@ class SV_Csync2StreamWrapper_Model_Template extends XFCP_SV_Csync2StreamWrapper_
         SV_Csync2StreamWrapper_csyncwrapper::DeferrCommit(true);
         try
         {
-            return parent::compileMappedTemplatesInStyleTree($parsedRecord);  
+            return parent::compileMappedTemplatesInStyleTree($templateMapIds);  
         }
         finally
         {
