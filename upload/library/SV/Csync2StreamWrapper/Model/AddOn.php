@@ -34,7 +34,7 @@ class SV_Csync2StreamWrapper_Model_AddOn extends XFCP_SV_Csync2StreamWrapper_Mod
         SV_Csync2StreamWrapper_csyncwrapper::DeferrCommit(true);
         try
         {
-            return parent::rebuildAddOnCaches($fileName, upgradeAddOnId);
+            return parent::rebuildAddOnCaches();
         }
         finally
         {

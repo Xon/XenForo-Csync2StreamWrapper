@@ -1,5 +1,5 @@
 <?xml version="1.0" encoding="utf-8"?>
-<addon addon_id="SVCsync2StreamWrapper" title="SV: Csync2 StreamWrapper" version_string="1.0.0b" version_id="1407234520" url="http://forums.sufficientvelocity.com/" install_callback_class="" install_callback_method="" uninstall_callback_class="" uninstall_callback_method="">
+<addon addon_id="SVCsync2StreamWrapper" title="SV: Csync2 StreamWrapper" version_string="1.0.1" version_id="101" url="http://forums.sufficientvelocity.com/" install_callback_class="" install_callback_method="" uninstall_callback_class="" uninstall_callback_method="">
   <admin_navigation/>
   <admin_permissions/>
   <admin_style_properties/>
@@ -10,6 +10,8 @@
     <listener event_id="init_dependencies" execute_order="10" callback_class="SV_Csync2StreamWrapper_Listener" callback_method="init_dependencies" active="1" hint="" description="Enable csync2://"/>
     <listener event_id="load_class_model" execute_order="10" callback_class="SV_Csync2StreamWrapper_Listener" callback_method="load_class_model" active="1" hint="XenForo_Model_Template" description="Speed up bulk template changes"/>
     <listener event_id="load_class_model" execute_order="10" callback_class="SV_Csync2StreamWrapper_Listener" callback_method="load_class_model" active="1" hint="XenForo_Model_Avatar" description="Reduce chatter for updating avatars"/>
+    <listener event_id="load_class_model" execute_order="10" callback_class="SV_Csync2StreamWrapper_Listener" callback_method="load_class_model" active="1" hint="Waindigo_InstallUpgrade_Model_InstallUpgrade" description="Support for Waindigo's Install and Upgrade addon"/>
+    <listener event_id="load_class_model" execute_order="10" callback_class="SV_Csync2StreamWrapper_Listener" callback_method="load_class_model" active="1" hint="XenForo_Model_AddOn" description="Catch when Addons are updated or uploaded"/>
   </code_event_listeners>
   <cron/>
   <email_templates/>
