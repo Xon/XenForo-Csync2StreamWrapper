@@ -18,6 +18,12 @@ class SV_Csync2StreamWrapper_Listener
             case 'XenForo_Model_Avatar':
                 $extend[] = 'SV_Csync2StreamWrapper_Model_Avatar';
                 break;
+            case 'Waindigo_InstallUpgrade_Model_InstallUpgrade':
+                $extend[] = 'SV_Csync2StreamWrapper_Waindigo_Model_InstallUpgrade';
+                break;                
+            case 'XenForo_Model_AddOn':
+                $extend[] = 'SV_Csync2StreamWrapper_Model_AddOn';
+                break;                 
         }
 
 	}    

@@ -3,6 +3,8 @@ Xenforo-SVCsync2StreamWrapper
 
 Provides a csync2:// stream for synchronous replication. 
 
+Supports Waindigo's Install and Upgrade addon
+
 Notifications of Deletes/Writes to this stream are pushed to Csync2 to distribute to pre-configured Csync2 config. 
 
 Requires:
