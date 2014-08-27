@@ -34,7 +34,7 @@ class SV_Csync2StreamWrapper_csyncwrapper
     public static function RegisterStream()
     {
         global $csyncwrapper_installed,$csync2_deferred_count, $csync2_deferred_commit_bulk, $deferred_paths, $deferred_files, $csyncwrapper_debug_log, $csyncwrapper_database;
-        if ($csyncwrapper_installed)
+        if (isset($csyncwrapper_installed) && $csyncwrapper_installed)
             return;
         $csyncwrapper_installed = true;
         //setlocale(LC_CTYPE, "en_US.UTF-8");
