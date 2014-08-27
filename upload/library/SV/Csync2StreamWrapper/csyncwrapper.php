@@ -18,7 +18,8 @@ function generateCallTrace()
     
     return "\t" . implode("\n\t", $result);
 }
-   
+$csyncwrapper_installed = false;   
+
 class SV_Csync2StreamWrapper_csyncwrapper   
 {
 
@@ -32,7 +33,10 @@ class SV_Csync2StreamWrapper_csyncwrapper
      
     public static function RegisterStream()
     {
-        global $csync2_deferred_count, $csync2_deferred_commit_bulk, $deferred_paths, $deferred_files, $csyncwrapper_debug_log, $csyncwrapper_database;
+        global $csyncwrapper_installed,$csync2_deferred_count, $csync2_deferred_commit_bulk, $deferred_paths, $deferred_files, $csyncwrapper_debug_log, $csyncwrapper_database;
+        if ($csyncwrapper_installed)
+            return;
+        $csyncwrapper_installed = true;
         //setlocale(LC_CTYPE, "en_US.UTF-8");
         stream_wrapper_register(self::prefix, "SV_Csync2StreamWrapper_csyncwrapper");
         
