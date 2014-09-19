@@ -392,11 +392,10 @@ class SV_Csync2StreamWrapper_csyncwrapper
         return fseek($this->streamhandle,$offset,$whence) == 0;
     }
     
-    //public function stream_set_option ( $option , $arg1 , $arg2 )
-    //{
-    //    throw new Exception("Not implemented");
-    //}
-    
+    public function stream_cast( $cast_as )
+    {
+        return $this->streamhandle;
+    }   
     
     public function stream_stat (  )
     {
