@@ -122,7 +122,7 @@ class SV_Csync2StreamWrapper_csyncwrapper
                     if (isset($touched[$dir]))
                         continue;
                     $touched[$dir] = true;
-                    self::ConsiderFileOrDir($path, true);
+                    self::ConsiderFileOrDir($dir, true);
                 }
                 $touched = array();
                 foreach($deferred_files as $file)
