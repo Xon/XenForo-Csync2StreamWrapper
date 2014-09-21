@@ -364,16 +364,14 @@ class SV_Csync2StreamWrapper_csyncwrapper
         $this->parsedPath = self::ParsePath($path);
         if (!$this->parsedPath)
         {
-            if ($options & STREAM_REPORT_ERRORS)
-            {
-                trigger_error('stream_open() passed an invalid path', E_USER_WARNING);
-            }
-            return False;
+            throw new Exception('stream_open() passed an invalid path');
         }
-        
-        $this->streamhandle = ($options & STREAM_REPORT_ERRORS) ? fopen($this->parsedPath, $mode) : @fopen($this->parsedPath, $mode);
+        $use_include_path  = ($options & STREAM_USE_PATH) == STREAM_USE_PATH;        
+        $this->streamhandle = fopen($this->parsedPath, $mode, $use_include_path );
         if ($this->streamhandle !== False)        
             $opened_path = $path;
+        else
+            throw new Exception('Call to fopen() failed');
         
         return $this->streamhandle !== False;
     }
