@@ -23,8 +23,10 @@ class SV_Csync2StreamWrapper_Listener
                 break;                
             case 'XenForo_Model_AddOn':
                 $extend[] = 'SV_Csync2StreamWrapper_Model_AddOn';
-                break;                 
+                break; 
+            case 'XenForo_Model_Sitemap':
+                $extend[] = 'SV_Csync2StreamWrapper_Model_Sitemap';
+                break;
         }
-
 	}    
 }
