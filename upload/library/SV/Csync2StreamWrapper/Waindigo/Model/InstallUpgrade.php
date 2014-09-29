@@ -15,12 +15,12 @@ class SV_Csync2StreamWrapper_Waindigo_Model_InstallUpgrade extends XFCP_SV_Csync
         }
     } 
 
-	public function checkForAddOnUpdates(array &$addOns, &$errorString = null)
+	public function checkForAddOnUpdates(array &$addOns, &$errorString = null, $overrideCheck = false)
 	{
         SV_Csync2StreamWrapper_csyncwrapper::DeferrCommit(true);
         try
         {
-            return parent::checkForAddOnUpdates($addOns, $errorString);
+            return parent::checkForAddOnUpdates($addOns, $errorString, $overrideCheck);
         }
         finally
         {
