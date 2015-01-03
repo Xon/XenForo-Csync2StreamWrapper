@@ -100,8 +100,8 @@ class SV_Csync2StreamWrapper_csyncwrapper
         if (!$config->isInstalled())
             return;
 
-        $config->$deferred_count += 1;
-        $config->$deferred_commit_bulk = $bulk_commit_hint;
+        $config->deferred_count += 1;
+        $config->deferred_commit_bulk = $bulk_commit_hint;
     }
     
     public static function FinalizeCommit()
@@ -110,14 +110,14 @@ class SV_Csync2StreamWrapper_csyncwrapper
         if (!$config->isInstalled())
             return;
 
-        $config->$deferred_count -= 1;
-        if ($config->$deferred_count <= 0)
+        $config->deferred_count -= 1;
+        if ($config->deferred_count <= 0)
         {
-            $config->$deferred_count = 0;
-            if (!$config->$deferred_commit_bulk)
+            $config->deferred_count = 0;
+            if (!$config->deferred_commit_bulk)
             {
                 $touched = array();
-                foreach($config->$deferred_paths as &$dir)
+                foreach($config->deferred_paths as &$dir)
                 {
                     if (isset($touched[$dir]))
                         continue;
@@ -125,7 +125,7 @@ class SV_Csync2StreamWrapper_csyncwrapper
                     self::ConsiderFileOrDir($dir, true);
                 }
                 $touched = array();
-                foreach($config->$deferred_files as &$file)
+                foreach($config->deferred_files as &$file)
                 {
                     if (isset($touched[$file]))
                         continue;   
@@ -133,9 +133,9 @@ class SV_Csync2StreamWrapper_csyncwrapper
                     self::ConsiderFileOrDir($file, false);
                 }
             }
-            self::CommitChanges($config->$deferred_commit_bulk);
-            $config->$deferred_paths = array();
-            $config->$deferred_files = array();
+            self::CommitChanges($config->deferred_commit_bulk);
+            $config->deferred_paths = array();
+            $config->deferred_files = array();
         }
     }    
     
@@ -145,31 +145,31 @@ class SV_Csync2StreamWrapper_csyncwrapper
         if (!$config->isInstalled())
             return;
         
-        if ($config->$deferred_count > 0)
+        if ($config->deferred_count > 0)
         {
-            if (!$config->$deferred_commit_bulk)
+            if (!$config->deferred_commit_bulk)
             {
                 if ($is_path)
-                    $config->$deferred_paths[] = $path;
+                    $config->deferred_paths[] = $path;
                 else
-                    $config->$deferred_files[] = $path;
+                    $config->deferred_files[] = $path;
             }
             return;
         }
         // csync2 directly inspects the argc passed to the process and ignores shell expansions, so escaping doesn't work
         $flags = "cr" ;
-        if ($config->$debug_mode && $config->$debug_log)
+        if ($config->debug_mode && $config->debug_log)
             $flags .= "v"; 
-        if ($config->$csync_database)
-            $flags .= " -D ".$config->$csync_database;
-        $input = $config->$csync2_binary . " -".$flags." " . $path ." 2>&1";
+        if ($config->csync_database)
+            $flags .= " -D ".$config->csync_database;
+        $input = $config->csync2_binary . " -".$flags." " . $path ." 2>&1";
         $output = shell_exec($input);
         
-        if ($config->$debug_mode && $config->$debug_log)
+        if ($config->debug_mode && $config->debug_log)
         {
-            file_put_contents($config->$debug_log,generateCallTrace()."\n", FILE_APPEND);
-            file_put_contents($config->$debug_log,$input."\n", FILE_APPEND);
-            file_put_contents($config->$debug_log,$output."\n", FILE_APPEND);
+            file_put_contents($config->debug_log,generateCallTrace()."\n", FILE_APPEND);
+            file_put_contents($config->debug_log,$input."\n", FILE_APPEND);
+            file_put_contents($config->debug_log,$output."\n", FILE_APPEND);
         }
     }
     
@@ -179,25 +179,25 @@ class SV_Csync2StreamWrapper_csyncwrapper
         if (!$config->isInstalled())
             return;
             
-        if ($config->$deferred_count  > 0)
+        if ($config->deferred_count  > 0)
             return;
         
         if($bulk)
             $flags = "x" ;
         else
             $flags = "ur" ;
-        if ($config->$debug_mode && $config->$debug_log)
+        if ($config->debug_mode && $config->debug_log)
             $flags .= "v";     
-        if ($config->$csync_database)
-            $flags .= " -D ".$config->$csync_database;         
-        $input = $config->$csync2_binary . " -".$flags ." 2>&1";
+        if ($config->csync_database)
+            $flags .= " -D ".$config->csync_database;         
+        $input = $config->csync2_binary . " -".$flags ." 2>&1";
         $output = shell_exec($input);
         
-        if ($config->$debug_mode && $config->$debug_log)
+        if ($config->debug_mode && $config->debug_log)
         {        
-            file_put_contents($config->$debug_log,generateCallTrace()."\n", FILE_APPEND);
-            file_put_contents($config->$debug_log,$input."\n", FILE_APPEND);
-            file_put_contents($config->$debug_log,$output."\n", FILE_APPEND);       
+            file_put_contents($config->debug_log,generateCallTrace()."\n", FILE_APPEND);
+            file_put_contents($config->debug_log,$input."\n", FILE_APPEND);
+            file_put_contents($config->debug_log,$output."\n", FILE_APPEND);       
         }
     }
     
