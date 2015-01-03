@@ -1,6 +1,6 @@
 <?php
 
-class SV_Csync2StreamWrapper_Model_AddOn extends XFCP_SV_Csync2StreamWrapper_Model_AddOn
+class SV_Csync2StreamWrapper_XenForo_Model_AddOn extends XFCP_SV_Csync2StreamWrapper_XenForo_Model_AddOn
 {
 
     public function installAddOnXmlFromFile($fileName, $upgradeAddOnId = false)

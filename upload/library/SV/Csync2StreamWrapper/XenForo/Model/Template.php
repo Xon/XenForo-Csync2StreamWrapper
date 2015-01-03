@@ -1,6 +1,6 @@
 <?php
 
-class SV_Csync2StreamWrapper_Model_Template extends XFCP_SV_Csync2StreamWrapper_Model_Template
+class SV_Csync2StreamWrapper_XenForo_Model_Template extends XFCP_SV_Csync2StreamWrapper_XenForo_Model_Template
 {
 
 	public function deleteTemplatesForAddOn($addOnId)

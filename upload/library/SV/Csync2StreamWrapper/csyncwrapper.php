@@ -33,19 +33,13 @@ class SV_Csync2StreamWrapper_csyncwrapper
      
     public static function RegisterStream()
     {
-        global $csyncwrapper_installed,$csync2_deferred_count, $csync2_deferred_commit_bulk, $deferred_paths, $deferred_files, $csyncwrapper_debug_log, $csyncwrapper_database;
-        if (isset($csyncwrapper_installed) && $csyncwrapper_installed)
+        $config = SV_Csync2StreamWrapper_CsyncConfig::getInstance();
+
+        if ($config->isInstalled())
             return;
-        $csyncwrapper_installed = true;
-        //setlocale(LC_CTYPE, "en_US.UTF-8");
-        stream_wrapper_register(self::prefix, "SV_Csync2StreamWrapper_csyncwrapper");
+        $config->setInstalled(true);
         
-        $csync2_deferred_count = 0;
-        $csync2_deferred_commit_bulk = false;
-        $deferred_paths = array();
-        $deferred_files =  array();
-        //$csyncwrapper_debug_log = "/var/www/html/error.log";
-        //$csyncwrapper_database = "/var/lib/csync2";
+        stream_wrapper_register(self::prefix, "SV_Csync2StreamWrapper_csyncwrapper");
     }
    
     protected static function absolutePath($path)
@@ -102,22 +96,28 @@ class SV_Csync2StreamWrapper_csyncwrapper
     
     public static function DeferrCommit($bulk_commit_hint = false)
     {
-        global $csync2_deferred_count,$csync2_deferred_commit_bulk;
-        $csync2_deferred_count += 1;
-        $csync2_deferred_commit_bulk = $bulk_commit_hint;
+        $config = SV_Csync2StreamWrapper_CsyncConfig::getInstance();
+        if (!$config->isInstalled())
+            return;
+
+        $config->$deferred_count += 1;
+        $config->$deferred_commit_bulk = $bulk_commit_hint;
     }
     
     public static function FinalizeCommit()
     {
-        global $csync2_deferred_count, $csync2_deferred_commit_bulk, $deferred_paths, $deferred_files;
-        $csync2_deferred_count -= 1;
-        if ($csync2_deferred_count <= 0)
+        $config = SV_Csync2StreamWrapper_CsyncConfig::getInstance();
+        if (!$config->isInstalled())
+            return;
+
+        $config->$deferred_count -= 1;
+        if ($config->$deferred_count <= 0)
         {
-            $csync2_deferred_count = 0;
-            if (!$csync2_deferred_commit_bulk)
+            $config->$deferred_count = 0;
+            if (!$config->$deferred_commit_bulk)
             {
                 $touched = array();
-                foreach($deferred_paths as $dir)
+                foreach($config->$deferred_paths as &$dir)
                 {
                     if (isset($touched[$dir]))
                         continue;
@@ -125,7 +125,7 @@ class SV_Csync2StreamWrapper_csyncwrapper
                     self::ConsiderFileOrDir($dir, true);
                 }
                 $touched = array();
-                foreach($deferred_files as $file)
+                foreach($config->$deferred_files as &$file)
                 {
                     if (isset($touched[$file]))
                         continue;   
@@ -133,65 +133,71 @@ class SV_Csync2StreamWrapper_csyncwrapper
                     self::ConsiderFileOrDir($file, false);
                 }
             }
-            self::CommitChanges($csync2_deferred_commit_bulk);
-            $deferred_paths = array();
-            $deferred_files = array();
+            self::CommitChanges($config->$deferred_commit_bulk);
+            $config->$deferred_paths = array();
+            $config->$deferred_files = array();
         }
     }    
     
     protected static function ConsiderFileOrDir($path,$is_path)
     {
-        global $csync2_deferred_count, $csync2_deferred_commit_bulk, $deferred_files, $deferred_paths, $csyncwrapper_debug_log, $csyncwrapper_database;
-        if ($csync2_deferred_count > 0)
+        $config = SV_Csync2StreamWrapper_CsyncConfig::getInstance();
+        if (!$config->isInstalled())
+            return;
+        
+        if ($config->$deferred_count > 0)
         {
-            if (!$csync2_deferred_commit_bulk)
+            if (!$config->$deferred_commit_bulk)
             {
                 if ($is_path)
-                    $deferred_paths[] = $path;
+                    $config->$deferred_paths[] = $path;
                 else
-                    $deferred_files[] = $path;
+                    $config->$deferred_files[] = $path;
             }
             return;
         }
         // csync2 directly inspects the argc passed to the process and ignores shell expansions, so escaping doesn't work
         $flags = "cr" ;
-        if (isset($csyncwrapper_debug_log) && $csyncwrapper_debug_log)
+        if ($config->$debug_mode && $config->$debug_log)
             $flags .= "v"; 
-        if (isset($csyncwrapper_database) && $csyncwrapper_database)
-            $flags .= " -D ".$csyncwrapper_database;
-        $input = self::csync2 . " -".$flags." " . $path ." 2>&1";
+        if ($config->$csync_database)
+            $flags .= " -D ".$config->$csync_database;
+        $input = $config->$csync2_binary . " -".$flags." " . $path ." 2>&1";
         $output = shell_exec($input);
         
-        if (isset($csyncwrapper_debug_log) && $csyncwrapper_debug_log)
+        if ($config->$debug_mode && $config->$debug_log)
         {
-            file_put_contents($csyncwrapper_debug_log,generateCallTrace()."\n", FILE_APPEND);
-            file_put_contents($csyncwrapper_debug_log,$input."\n", FILE_APPEND);
-            file_put_contents($csyncwrapper_debug_log,$output."\n", FILE_APPEND);
+            file_put_contents($config->$debug_log,generateCallTrace()."\n", FILE_APPEND);
+            file_put_contents($config->$debug_log,$input."\n", FILE_APPEND);
+            file_put_contents($config->$debug_log,$output."\n", FILE_APPEND);
         }
     }
     
     protected static function CommitChanges($bulk = false)
     {    
-        global $csync2_deferred_count,$csyncwrapper_debug_log, $csyncwrapper_database;
-        if ($csync2_deferred_count  > 0)
+        $config = SV_Csync2StreamWrapper_CsyncConfig::getInstance();
+        if (!$config->isInstalled())
+            return;
+            
+        if ($config->$deferred_count  > 0)
             return;
         
         if($bulk)
             $flags = "x" ;
         else
             $flags = "ur" ;
-        if (isset($csyncwrapper_debug_log) && $csyncwrapper_debug_log)
+        if ($config->$debug_mode && $config->$debug_log)
             $flags .= "v";     
-        if (isset($csyncwrapper_database) && $csyncwrapper_database)
-            $flags .= " -D ".$csyncwrapper_database;           
-        $input = self::csync2 . " -".$flags ." 2>&1";
+        if ($config->$csync_database)
+            $flags .= " -D ".$config->$csync_database;         
+        $input = $config->$csync2_binary . " -".$flags ." 2>&1";
         $output = shell_exec($input);
         
-        if (isset($csyncwrapper_debug_log) && $csyncwrapper_debug_log)
+        if ($config->$debug_mode && $config->$debug_log)
         {        
-            file_put_contents($csyncwrapper_debug_log,generateCallTrace()."\n", FILE_APPEND);
-            file_put_contents($csyncwrapper_debug_log,$input."\n", FILE_APPEND);
-            file_put_contents($csyncwrapper_debug_log,$output."\n", FILE_APPEND);        
+            file_put_contents($config->$debug_log,generateCallTrace()."\n", FILE_APPEND);
+            file_put_contents($config->$debug_log,$input."\n", FILE_APPEND);
+            file_put_contents($config->$debug_log,$output."\n", FILE_APPEND);       
         }
     }
     

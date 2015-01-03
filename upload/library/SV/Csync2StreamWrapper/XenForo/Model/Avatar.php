@@ -1,6 +1,6 @@
 <?php
 
-class SV_Csync2StreamWrapper_Model_Avatar extends XFCP_SV_Csync2StreamWrapper_Model_Avatar
+class SV_Csync2StreamWrapper_XenForo_Model_Avatar extends XFCP_SV_Csync2StreamWrapper_XenForo_Model_Avatar
 {
 
     protected function _writeAvatar($userId, $size, $tempFile)

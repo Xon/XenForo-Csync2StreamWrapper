@@ -1,6 +1,6 @@
 <?php
 
-class SV_Csync2StreamWrapper_Model_Sitemap extends XFCP_SV_Csync2StreamWrapper_Model_Sitemap
+class SV_Csync2StreamWrapper_XenForo_Model_Sitemap extends XFCP_SV_Csync2StreamWrapper_XenForo_Model_Sitemap
 {
 
     public function cleanUpOldSitemaps($skipId = null)

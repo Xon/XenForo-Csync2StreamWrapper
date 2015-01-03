@@ -1,6 +1,6 @@
 <?php
 
-class SV_Csync2StreamWrapper_Waindigo_Model_InstallUpgrade extends XFCP_SV_Csync2StreamWrapper_Waindigo_Model_InstallUpgrade
+class SV_Csync2StreamWrapper_Waindigo_InstallUpgrade_Model_InstallUpgrade extends XFCP_SV_Csync2StreamWrapper_Waindigo_InstallUpgrade_Model_InstallUpgrade
 {
 	public function extractFromFile($fileName, $type = '')
 	{
