@@ -30,6 +30,7 @@ class SV_Csync2StreamWrapper_csyncwrapper
     /* Methods */
     
     const prefix = "csync2";
+    const prefix_full = "csync2://";
      
     public static function RegisterStream()
     {
@@ -53,9 +54,11 @@ class SV_Csync2StreamWrapper_csyncwrapper
 
         // resolve path parts (single dot, double dot and double delimiters)
         $path = str_replace(array('/', '\\'), DIRECTORY_SEPARATOR, $path);
-        $pathParts = array_filter(explode(DIRECTORY_SEPARATOR, $path), 'strlen');
+        $pathParts = explode(DIRECTORY_SEPARATOR, $path);
         $absolutePathParts = array();
         foreach ($pathParts as $part) {
+            if ($part == '' && $part !== '0')
+                continue;
             if ($part == '.')
                 continue;
 
@@ -78,21 +81,25 @@ class SV_Csync2StreamWrapper_csyncwrapper
     }   
     protected static function ParsePath($path)
     {
-        $prefix = self::prefix . "://";        
-        if (substr($path, 0, strlen($prefix)) == $prefix) {
-            $path = substr($path, strlen($prefix));            
+        static $urls = array();
+
+        if (isset($urls[$path]))
+        {
+            return $urls[$path];
+        }
+        
+        $prefix_len = strlen(self::prefix_full);
+        if (substr($path, 0, $prefix_len) == self::prefix_full) {
+            $path = substr($path, $prefix_len);
             $url = parse_url($path);
             if (isset($url['path']) && !isset($url['scheme']))
             {
-                return self::absolutePath($path);
+                $urls[$path] = self::absolutePath($path);
+                return $urls[$path];
             }
         } 
         return False;
     }
-    
-    const csync2 = "/usr/sbin/csync2";
-    //static $debug_log;
-    
     
     public static function DeferrCommit($bulk_commit_hint = false)
     {
@@ -444,7 +451,7 @@ class SV_Csync2StreamWrapper_csyncwrapper
     }
 
     public function url_stat ( $path , $flags )
-    {    
+    {
         $path = self::ParsePath($path);
         if (!$path)
             return 0;        
