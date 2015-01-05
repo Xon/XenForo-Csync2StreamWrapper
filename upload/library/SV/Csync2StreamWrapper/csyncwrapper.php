@@ -90,11 +90,11 @@ class SV_Csync2StreamWrapper_csyncwrapper
         
         $prefix_len = strlen(self::prefix_full);
         if (substr($path, 0, $prefix_len) == self::prefix_full) {
-            $path = substr($path, $prefix_len);
-            $url = parse_url($path);
+            $schemaless_path = substr($path, $prefix_len);
+            $url = parse_url($schemaless_path);
             if (isset($url['path']) && !isset($url['scheme']))
             {
-                $urls[$path] = self::absolutePath($path);
+                $urls[$path] = self::absolutePath($schemaless_path);
                 return $urls[$path];
             }
         } 
