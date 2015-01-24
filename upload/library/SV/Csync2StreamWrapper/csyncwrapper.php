@@ -98,6 +98,7 @@ class SV_Csync2StreamWrapper_csyncwrapper
                 return $urls[$path];
             }
         } 
+        $urls[$path] = false;
         return False;
     }
     
