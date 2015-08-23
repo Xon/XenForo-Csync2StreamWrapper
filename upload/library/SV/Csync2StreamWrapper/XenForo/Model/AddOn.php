@@ -15,25 +15,25 @@ class SV_Csync2StreamWrapper_XenForo_Model_AddOn extends XFCP_SV_Csync2StreamWra
         }
     }
     
-    public function recursiveCopy($source, $destination)
+    public function deleteAll($directory, $empty = false)
     {
         SV_Csync2StreamWrapper_csyncwrapper::DeferrCommit(true);
         try
         {
-            return parent::recursiveCopy($source, $destination);
+            return parent::deleteAll($directory, $empty);
         }
         finally
         {
             SV_Csync2StreamWrapper_csyncwrapper::FinalizeCommit();
         }
     }
-    
-    public function deployFiles($deployMethod, array $addOnDirs = null)
+
+    public function recursiveCopy($source, $destination)
     {
         SV_Csync2StreamWrapper_csyncwrapper::DeferrCommit(true);
         try
         {
-            return parent::deployFiles($deployMethod, $addOnDirs);
+            return parent::recursiveCopy($source, $destination);
         }
         finally
         {
