@@ -15,5 +15,10 @@ Requires:
     - chown php-user:php-user /var/lib/csync2
     - php-user also requires access to the key file for the group sync config.
 - Don't sync the sqlite database!
+
+Assumes the following csync2 groups are setup:
+- www_code
+- www_data
+- www_templates
     
 

@@ -4,7 +4,7 @@ class SV_Csync2StreamWrapper_XenForo_Model_AddOn extends XFCP_SV_Csync2StreamWra
 {
     public function extractZip($fileName, $baseDir = 'install/addons', $installId = null)
     {
-        SV_Csync2StreamWrapper_csyncwrapper::DeferrCommit(true);
+        SV_Csync2StreamWrapper_csyncwrapper::DeferrCommit([SV_Csync2StreamWrapper_CsyncConfig::getInstance()->www_code], true);
         try
         {
             return parent::extractZip($fileName, $baseDir, $installId);
@@ -14,10 +14,10 @@ class SV_Csync2StreamWrapper_XenForo_Model_AddOn extends XFCP_SV_Csync2StreamWra
             SV_Csync2StreamWrapper_csyncwrapper::FinalizeCommit();
         }
     }
-    
+
     public function deleteAll($directory, $empty = false)
     {
-        SV_Csync2StreamWrapper_csyncwrapper::DeferrCommit(true);
+        SV_Csync2StreamWrapper_csyncwrapper::DeferrCommit([SV_Csync2StreamWrapper_CsyncConfig::getInstance()->www_code], true);
         try
         {
             return parent::deleteAll($directory, $empty);
@@ -30,7 +30,7 @@ class SV_Csync2StreamWrapper_XenForo_Model_AddOn extends XFCP_SV_Csync2StreamWra
 
     public function recursiveCopy($source, $destination)
     {
-        SV_Csync2StreamWrapper_csyncwrapper::DeferrCommit(true);
+        SV_Csync2StreamWrapper_csyncwrapper::DeferrCommit([SV_Csync2StreamWrapper_CsyncConfig::getInstance()->www_code], true);
         try
         {
             return parent::recursiveCopy($source, $destination);
@@ -43,7 +43,7 @@ class SV_Csync2StreamWrapper_XenForo_Model_AddOn extends XFCP_SV_Csync2StreamWra
 
     public function installAddOnXmlFromFile($fileName, $upgradeAddOnId = false)
     {
-        SV_Csync2StreamWrapper_csyncwrapper::DeferrCommit(true);
+        SV_Csync2StreamWrapper_csyncwrapper::DeferrCommit([SV_Csync2StreamWrapper_CsyncConfig::getInstance()->www_code], true);
         try
         {
             return parent::installAddOnXmlFromFile($fileName, $upgradeAddOnId);
@@ -53,10 +53,10 @@ class SV_Csync2StreamWrapper_XenForo_Model_AddOn extends XFCP_SV_Csync2StreamWra
             SV_Csync2StreamWrapper_csyncwrapper::FinalizeCommit();
         }
     }
-    
+
     public function installAddOnXml(SimpleXMLElement $xml, $upgradeAddOnId = false)
     {
-        SV_Csync2StreamWrapper_csyncwrapper::DeferrCommit(true);
+        SV_Csync2StreamWrapper_csyncwrapper::DeferrCommit([SV_Csync2StreamWrapper_CsyncConfig::getInstance()->www_code, SV_Csync2StreamWrapper_CsyncConfig::getInstance()->www_templates], true);
         try
         {
             return parent::installAddOnXml($xml, $upgradeAddOnId);
@@ -66,10 +66,10 @@ class SV_Csync2StreamWrapper_XenForo_Model_AddOn extends XFCP_SV_Csync2StreamWra
             SV_Csync2StreamWrapper_csyncwrapper::FinalizeCommit();
         }
     }
-    
+
     public function importAddOnExtraDataFromXml(SimpleXMLElement $xml, $addOnId)
     {
-        SV_Csync2StreamWrapper_csyncwrapper::DeferrCommit(true);
+        SV_Csync2StreamWrapper_csyncwrapper::DeferrCommit([SV_Csync2StreamWrapper_CsyncConfig::getInstance()->www_code, SV_Csync2StreamWrapper_CsyncConfig::getInstance()->www_templates], true);
         try
         {
             return parent::importAddOnExtraDataFromXml($xml, $addOnId);
@@ -79,10 +79,10 @@ class SV_Csync2StreamWrapper_XenForo_Model_AddOn extends XFCP_SV_Csync2StreamWra
             SV_Csync2StreamWrapper_csyncwrapper::FinalizeCommit();
         }
     }
-    
-	public function deleteAddOnMasterData($addOnId)
-	{
-        SV_Csync2StreamWrapper_csyncwrapper::DeferrCommit(true);
+
+    public function deleteAddOnMasterData($addOnId)
+    {
+        SV_Csync2StreamWrapper_csyncwrapper::DeferrCommit([SV_Csync2StreamWrapper_CsyncConfig::getInstance()->www_code, SV_Csync2StreamWrapper_CsyncConfig::getInstance()->www_templates], true);
         try
         {
             return parent::deleteAddOnMasterData($addOnId);
@@ -90,12 +90,12 @@ class SV_Csync2StreamWrapper_XenForo_Model_AddOn extends XFCP_SV_Csync2StreamWra
         finally
         {
             SV_Csync2StreamWrapper_csyncwrapper::FinalizeCommit();
-        }    
-    }    
-    
-	public function rebuildAddOnCaches()
-	{
-        SV_Csync2StreamWrapper_csyncwrapper::DeferrCommit(true);
+        }
+    }
+
+    public function rebuildAddOnCaches()
+    {
+        SV_Csync2StreamWrapper_csyncwrapper::DeferrCommit([SV_Csync2StreamWrapper_CsyncConfig::getInstance()->www_code, SV_Csync2StreamWrapper_CsyncConfig::getInstance()->www_templates], true);
         try
         {
             return parent::rebuildAddOnCaches();
@@ -103,12 +103,12 @@ class SV_Csync2StreamWrapper_XenForo_Model_AddOn extends XFCP_SV_Csync2StreamWra
         finally
         {
             SV_Csync2StreamWrapper_csyncwrapper::FinalizeCommit();
-        }    
-    }    
+        }
+    }
 
-	public function rebuildAddOnCachesAfterActiveSwitch(array $addon)
-	{
-        SV_Csync2StreamWrapper_csyncwrapper::DeferrCommit(true);
+    public function rebuildAddOnCachesAfterActiveSwitch(array $addon)
+    {
+        SV_Csync2StreamWrapper_csyncwrapper::DeferrCommit([SV_Csync2StreamWrapper_CsyncConfig::getInstance()->www_code, SV_Csync2StreamWrapper_CsyncConfig::getInstance()->www_templates], true);
         try
         {
             return parent::rebuildAddOnCachesAfterActiveSwitch($addon);
@@ -116,6 +116,6 @@ class SV_Csync2StreamWrapper_XenForo_Model_AddOn extends XFCP_SV_Csync2StreamWra
         finally
         {
             SV_Csync2StreamWrapper_csyncwrapper::FinalizeCommit();
-        }    
-    }        
+        }
+    }
 }

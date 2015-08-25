@@ -4,7 +4,7 @@ class SV_Csync2StreamWrapper_XenForo_ControllerAdmin_AddOn extends XFCP_SV_Csync
 {
     public function actionStepUpload()
     {
-        SV_Csync2StreamWrapper_csyncwrapper::DeferrCommit(true);
+        SV_Csync2StreamWrapper_csyncwrapper::DeferrCommit([SV_Csync2StreamWrapper_CsyncConfig::getInstance()->www_code], true);
         try
         {
             return parent::actionStepUpload();
@@ -17,7 +17,7 @@ class SV_Csync2StreamWrapper_XenForo_ControllerAdmin_AddOn extends XFCP_SV_Csync
 
     public function actionStepExtract()
     {
-        SV_Csync2StreamWrapper_csyncwrapper::DeferrCommit(true);
+        SV_Csync2StreamWrapper_csyncwrapper::DeferrCommit([SV_Csync2StreamWrapper_CsyncConfig::getInstance()->www_code], true);
         try
         {
             return parent::actionStepExtract();
@@ -30,7 +30,7 @@ class SV_Csync2StreamWrapper_XenForo_ControllerAdmin_AddOn extends XFCP_SV_Csync
 
     public function actionStepDeploy()
     {
-        SV_Csync2StreamWrapper_csyncwrapper::DeferrCommit(true);
+        SV_Csync2StreamWrapper_csyncwrapper::DeferrCommit([SV_Csync2StreamWrapper_CsyncConfig::getInstance()->www_code], true);
         try
         {
             return parent::actionStepDeploy();
