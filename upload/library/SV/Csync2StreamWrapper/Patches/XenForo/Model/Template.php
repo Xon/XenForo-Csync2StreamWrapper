@@ -10,7 +10,14 @@ class SV_Csync2StreamWrapper_Patches_XenForo_Model_Template extends XFCP_SV_Csyn
         if ($templateFiles)
         {
             $filename = XenForo_Template_FileHandler::get($title, $styleId, $languageId);
-            $oldContents = @file_get_contents($filename);
+            try
+            {
+                $oldContents = @file_get_contents($filename);
+            }
+            catch(Exception $e)
+            {
+                $oldContents = false;
+            }
             if ($oldContents !== false)
             {
                 // XenForo_Template_FileHandler::save
