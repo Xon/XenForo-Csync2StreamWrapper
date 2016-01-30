@@ -20,7 +20,7 @@ class SV_Csync2StreamWrapper_CsyncConfig
     public $debug_mode = false;
     public $debug_log = "";// = "/var/www/html/error.log";
 
-    public $csync_groups = array();
+    public $csync_groups = array('www_code', 'www_data', 'www_templates');
     public $www_code = 'www_code';
     public $www_data = 'www_data';
     public $www_templates = 'www_templates';
