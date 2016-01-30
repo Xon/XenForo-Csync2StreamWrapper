@@ -1,5 +1,5 @@
 <?xml version="1.0" encoding="utf-8"?>
-<addon addon_id="SVCsync2StreamWrapper" title="Csync2 StreamWrapper" version_string="1.0.10" version_id="10010" url="https://github.com/Xon/XenForo-SVCsync2StreamWrapper" install_callback_class="" install_callback_method="" uninstall_callback_class="" uninstall_callback_method="">
+<addon addon_id="SVCsync2StreamWrapper" title="Csync2 StreamWrapper" version_string="1.0.11" version_id="1001100" url="https://github.com/Xon/XenForo-SVCsync2StreamWrapper" install_callback_class="" install_callback_method="" uninstall_callback_class="" uninstall_callback_method="">
   <admin_navigation/>
   <admin_permissions/>
   <admin_style_properties/>
