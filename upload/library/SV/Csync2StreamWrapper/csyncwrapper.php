@@ -199,7 +199,6 @@ class SV_Csync2StreamWrapper_csyncwrapper
             if ($config->csync_groups)
             {
                 $flags .= ' -G '. join(',', $config->csync_groups);
-                $config->csync_groups = array();
             }
         }
         else
