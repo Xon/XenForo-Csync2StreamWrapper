@@ -47,7 +47,7 @@ class SV_Csync2StreamWrapper_XenForo_Model_Template extends XFCP_SV_Csync2Stream
         SV_Csync2StreamWrapper_csyncwrapper::DeferrCommit([SV_Csync2StreamWrapper_CsyncConfig::getInstance()->www_templates], true);
         try
         {
-            return parent::importTemplatesAddOnXml($xml, $styleId, $addOnId);
+            return parent::importTemplatesStyleXml($xml, $styleId, $addOnId);
         }
         finally
         {
