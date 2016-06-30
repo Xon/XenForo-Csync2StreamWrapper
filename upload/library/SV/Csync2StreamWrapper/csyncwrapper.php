@@ -115,6 +115,17 @@ class SV_Csync2StreamWrapper_csyncwrapper
         }
     }
 
+    public static function isTemp($path)
+    {
+        static $xfTemp = null;
+        if ($xfTemp === null)
+        {
+            $xfTemp = XenForo_Helper_File::getTempDir();
+            $xfTemp = self::ParsePath($xfTemp);
+        }
+        return !empty($xfTemp) && strpos($path, $xfTemp) !== false;
+    }
+
     public static function FinalizeCommit()
     {
         $config = SV_Csync2StreamWrapper_CsyncConfig::getInstance();
@@ -150,8 +161,14 @@ class SV_Csync2StreamWrapper_csyncwrapper
         }
     }
 
+    static $pendingChanges = false;
     protected static function ConsiderFileOrDir($path,$is_path)
     {
+        if (self::isTemp($path))
+        {
+            return;
+        }
+
         $config = SV_Csync2StreamWrapper_CsyncConfig::getInstance();
         if (!$config->isInstalled())
             return;
@@ -167,6 +184,7 @@ class SV_Csync2StreamWrapper_csyncwrapper
             }
             return;
         }
+        self::$pendingChanges = true;
         // csync2 directly inspects the argc passed to the process and ignores shell expansions, so escaping doesn't work
         $flags = "cr" ;
         if ($config->debug_mode && $config->debug_log)
@@ -203,8 +221,14 @@ class SV_Csync2StreamWrapper_csyncwrapper
         }
         else
         {
+            if (!self::$pendingChanges)
+            {
+                return;
+            }
             $flags = "ur" ;
         }
+        self::$pendingChanges = false;
+
         if ($config->debug_mode && $config->debug_log)
         {
             $flags .= " -v";
