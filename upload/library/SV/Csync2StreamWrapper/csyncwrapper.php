@@ -40,7 +40,7 @@ class SV_Csync2StreamWrapper_csyncwrapper
             return;
         $config->setInstalled(true);
 
-        stream_wrapper_register(self::prefix, "SV_Csync2StreamWrapper_csyncwrapper");
+        stream_wrapper_register(static::prefix, "SV_Csync2StreamWrapper_csyncwrapper");
     }
 
     protected static function absolutePath($path)
@@ -88,13 +88,13 @@ class SV_Csync2StreamWrapper_csyncwrapper
             return $urls[$path];
         }
 
-        $prefix_len = strlen(self::prefix_full);
-        if (substr($path, 0, $prefix_len) == self::prefix_full) {
+        $prefix_len = strlen(static::prefix_full);
+        if (substr($path, 0, $prefix_len) == static::prefix_full) {
             $schemaless_path = substr($path, $prefix_len);
             $url = parse_url($schemaless_path);
             if (isset($url['path']) && !isset($url['scheme']))
             {
-                $urls[$path] = self::absolutePath($schemaless_path);
+                $urls[$path] = static::absolutePath($schemaless_path);
                 return $urls[$path];
             }
         }
@@ -121,7 +121,7 @@ class SV_Csync2StreamWrapper_csyncwrapper
         if ($xfTemp === null)
         {
             $xfTemp = XenForo_Helper_File::getTempDir();
-            $xfTemp = self::ParsePath($xfTemp);
+            $xfTemp = static::ParsePath($xfTemp);
         }
         return !empty($xfTemp) && strpos($path, $xfTemp) !== false;
     }
@@ -144,7 +144,7 @@ class SV_Csync2StreamWrapper_csyncwrapper
                     if (isset($touched[$dir]))
                         continue;
                     $touched[$dir] = true;
-                    self::ConsiderFileOrDir($dir, true);
+                    static::ConsiderFileOrDir($dir, true);
                 }
                 $touched = array();
                 foreach($config->deferred_files as &$file)
@@ -152,10 +152,10 @@ class SV_Csync2StreamWrapper_csyncwrapper
                     if (isset($touched[$file]))
                         continue;
                     $touched[$file] = true;
-                    self::ConsiderFileOrDir($file, false);
+                    static::ConsiderFileOrDir($file, false);
                 }
             }
-            self::CommitChanges($config->deferred_commit_bulk);
+            static::CommitChanges($config->deferred_commit_bulk);
             $config->deferred_paths = array();
             $config->deferred_files = array();
         }
@@ -164,7 +164,7 @@ class SV_Csync2StreamWrapper_csyncwrapper
     static $pendingChanges = false;
     protected static function ConsiderFileOrDir($path,$is_path)
     {
-        if (self::isTemp($path))
+        if (static::isTemp($path))
         {
             return;
         }
@@ -184,22 +184,8 @@ class SV_Csync2StreamWrapper_csyncwrapper
             }
             return;
         }
-        self::$pendingChanges = true;
-        // csync2 directly inspects the argc passed to the process and ignores shell expansions, so escaping doesn't work
-        $flags = "cr" ;
-        if ($config->debug_mode && $config->debug_log)
-            $flags .= "v";
-        if ($config->csync_database)
-            $flags .= " -D ".$config->csync_database;
-        $input = $config->csync2_binary . " -".$flags." " . $path ." 2>&1";
-        $output = shell_exec($input);
-
-        if ($config->debug_mode && $config->debug_log)
-        {
-            file_put_contents($config->debug_log,generateCallTrace()."\n", FILE_APPEND);
-            file_put_contents($config->debug_log,$input."\n", FILE_APPEND);
-            file_put_contents($config->debug_log,$output."\n", FILE_APPEND);
-        }
+        static::$pendingChanges = true;
+        static::pushSingeChange($path);
     }
 
     protected static function CommitChanges($bulk = false)
@@ -221,14 +207,39 @@ class SV_Csync2StreamWrapper_csyncwrapper
         }
         else
         {
-            if (!self::$pendingChanges)
+            if (!static::$pendingChanges)
             {
                 return;
             }
             $flags = "ur" ;
         }
-        self::$pendingChanges = false;
+        static::$pendingChanges = false;
+        static::pushBulkChanges($flags);
+    }
+    
+    protected static function pushSingeChange($path)
+    {
+        $config = SV_Csync2StreamWrapper_CsyncConfig::getInstance();
+        // csync2 directly inspects the argc passed to the process and ignores shell expansions, so escaping doesn't work
+        $flags = "cr" ;
+        if ($config->debug_mode && $config->debug_log)
+            $flags .= "v";
+        if ($config->csync_database)
+            $flags .= " -D ".$config->csync_database;
+        $input = $config->csync2_binary . " -".$flags." " . $path ." 2>&1";
+        $output = shell_exec($input);
 
+        if ($config->debug_mode && $config->debug_log)
+        {
+            file_put_contents($config->debug_log,generateCallTrace()."\n", FILE_APPEND);
+            file_put_contents($config->debug_log,$input."\n", FILE_APPEND);
+            file_put_contents($config->debug_log,$output."\n", FILE_APPEND);
+        }
+    }
+    
+    protected static function pushBulkChanges($flags)
+    {
+        $config = SV_Csync2StreamWrapper_CsyncConfig::getInstance();
         if ($config->debug_mode && $config->debug_log)
         {
             $flags .= " -v";
@@ -269,7 +280,7 @@ class SV_Csync2StreamWrapper_csyncwrapper
 
     public function dir_opendir ( $path , $options )
     {
-        $path = self::ParsePath($path);
+        $path = static::ParsePath($path);
         if (!$path)
             return False;
 
@@ -293,29 +304,29 @@ class SV_Csync2StreamWrapper_csyncwrapper
 
     public function mkdir ( $path , $mode , $options )
     {
-        $path = self::ParsePath($path);
+        $path = static::ParsePath($path);
         if (!$path)
             return False;
         $recursive = ($options & STREAM_MKDIR_RECURSIVE) == STREAM_MKDIR_RECURSIVE;
         $ret = mkdir($path, $mode, $recursive);
         if ($ret)
         {
-            self::ConsiderFileOrDir($path, true);
-            self::CommitChanges();
+            static::ConsiderFileOrDir($path, true);
+            static::CommitChanges();
         }
         return $ret;
     }
 
     public function rmdir ( $path , $options )
     {
-        $path = self::ParsePath($path);
+        $path = static::ParsePath($path);
         if (!$path)
             return False;
         $ret = rmdir($path);
         if ($ret)
         {
-            self::ConsiderFileOrDir($path, true);
-            self::CommitChanges();
+            static::ConsiderFileOrDir($path, true);
+            static::CommitChanges();
         }
         return $ret;
     }
@@ -324,13 +335,13 @@ class SV_Csync2StreamWrapper_csyncwrapper
     public function rename ( $path_from , $path_to )
     {
         $paths = array();
-        $path_from_fix = self::ParsePath($path_from);
+        $path_from_fix = static::ParsePath($path_from);
         if (!$path_from_fix)
             $paths[] = $path_from_fix;
         else
             $path_to_fix = $path_to;
 
-        $path_to_fix = self::ParsePath($path_to);
+        $path_to_fix = static::ParsePath($path_to);
         if (!$path_to_fix)
             $paths[] = $path_to_fix;
         else
@@ -341,8 +352,8 @@ class SV_Csync2StreamWrapper_csyncwrapper
         throw new Exception(var_export($path_from, true) . var_export($path_to, true). var_export($paths, true) );
 
         foreach($paths as $path)
-            self::ConsiderFileOrDir($path);
-        self::CommitChanges();
+            static::ConsiderFileOrDir($path);
+        static::CommitChanges();
 
         return $ret;
     }
@@ -356,8 +367,8 @@ class SV_Csync2StreamWrapper_csyncwrapper
         $ret = fclose($this->streamhandle);
         if ($this->fileRequiresUpdate)
         {
-            self::ConsiderFileOrDir($this->parsedPath, false);
-            self::CommitChanges();
+            static::ConsiderFileOrDir($this->parsedPath, false);
+            static::CommitChanges();
             unset($this->parsedPath);
             unset($this->streamhandle);
             $this->fileRequiresUpdate = false;
@@ -380,7 +391,7 @@ class SV_Csync2StreamWrapper_csyncwrapper
 
     public function stream_metadata ( $path , $option , $value )
     {
-        $path = self::ParsePath($path);
+        $path = static::ParsePath($path);
         if (!$path)
             return False;
         $ret = False;
@@ -414,7 +425,7 @@ class SV_Csync2StreamWrapper_csyncwrapper
 
     public function stream_open ( $path , $mode , $options , &$opened_path )
     {
-        $this->parsedPath = self::ParsePath($path);
+        $this->parsedPath = static::ParsePath($path);
         if (!$this->parsedPath)
         {
             throw new Exception('stream_open() passed an invalid path');
@@ -480,19 +491,19 @@ class SV_Csync2StreamWrapper_csyncwrapper
 
     public function unlink ( $path )
     {
-        $path = self::ParsePath($path);
+        $path = static::ParsePath($path);
         if (!$path)
             return False;
         $is_dir = is_dir($path);
         $ret = @unlink($path);
-        self::ConsiderFileOrDir($path, $is_dir);
-        self::CommitChanges();
+        static::ConsiderFileOrDir($path, $is_dir);
+        static::CommitChanges();
         return $ret;
     }
 
     public function url_stat ( $path , $flags )
     {
-        $path = self::ParsePath($path);
+        $path = static::ParsePath($path);
         if (!$path)
             return 0;
         if ($flags & STREAM_URL_STAT_LINK)
