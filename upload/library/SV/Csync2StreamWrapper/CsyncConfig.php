@@ -129,19 +129,23 @@ class SV_Csync2StreamWrapper_CsyncConfig
         {
             return;
         }
-        if (!$config->isInstalled())
+        if (!$this->isInstalled())
         {
             return;
         }
 
-        if ($config->deferred_count > 0)
+        if ($this->deferred_count > 0)
         {
-            if (!$config->deferred_commit_bulk)
+            if (!$this->deferred_commit_bulk)
             {
                 if ($is_path)
-                    $config->deferred_paths[] = $path;
+                {
+                    $this->deferred_paths[] = $path;
+                }
                 else
-                    $config->deferred_files[] = $path;
+                {
+                    $this->deferred_files[] = $path;
+                }
             }
             return;
         }
@@ -191,7 +195,7 @@ class SV_Csync2StreamWrapper_CsyncConfig
         }
         if ($this->csync_database)
         {
-            $flags .= " -D ".$config->csync_database;
+            $flags .= " -D ".$this->csync_database;
         }
         $input = $this->csync2_binary . " -".$flags." " . $path ." 2>&1";
         $output = shell_exec($input);
