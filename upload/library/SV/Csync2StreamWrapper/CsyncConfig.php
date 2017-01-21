@@ -48,4 +48,181 @@ class SV_Csync2StreamWrapper_CsyncConfig
 
         return self::$_instance;
     }
+
+    public function RegisterStream()
+    {
+        if ($this->isInstalled())
+        {
+            return;
+        }
+        $this->setInstalled(true);
+
+        stream_wrapper_register(SV_Csync2StreamWrapper_csyncwrapper::prefix, "SV_Csync2StreamWrapper_csyncwrapper");
+    }
+
+    public function DeferrCommit(array $group_hints, $bulk_commit_hint = false)
+    {
+        if (!$this->isInstalled())
+        {
+            return;
+        }
+
+        $this->deferred_count += 1;
+        $this->deferred_commit_bulk = $bulk_commit_hint;
+        if ($group_hints)
+        {
+            $this->csync_groups = $this->csync_groups + $group_hints;
+        }
+    }
+
+    protected function isTemp($path)
+    {
+        static $xfTemp = null;
+        if ($xfTemp === null)
+        {
+            $xfTemp = XenForo_Helper_File::getTempDir();
+            $xfTemp = SV_Csync2StreamWrapper_csyncwrapper::ParsePath($xfTemp);
+        }
+        return !empty($xfTemp) && strpos($path, $xfTemp) !== false;
+    }
+
+    public function FinalizeCommit()
+    {
+        if (!$this->isInstalled())
+        {
+            return;
+        }
+
+        $this->deferred_count -= 1;
+        if ($this->deferred_count <= 0)
+        {
+            $this->deferred_count = 0;
+            if (!$this->deferred_commit_bulk)
+            {
+                $touched = array();
+                foreach($this->deferred_paths as &$dir)
+                {
+                    if (isset($touched[$dir]))
+                        continue;
+                    $touched[$dir] = true;
+                    $this->ConsiderFileOrDir($dir, true);
+                }
+                $touched = array();
+                foreach($this->deferred_files as &$file)
+                {
+                    if (isset($touched[$file]))
+                        continue;
+                    $touched[$file] = true;
+                    $this->ConsiderFileOrDir($file, false);
+                }
+            }
+            $this->CommitChanges($this->deferred_commit_bulk);
+            $this->deferred_paths = array();
+            $this->deferred_files = array();
+        }
+    }
+
+    protected $pendingChanges = false;
+    public function ConsiderFileOrDir($path,$is_path)
+    {
+        if ($this->isTemp($path))
+        {
+            return;
+        }
+        if (!$config->isInstalled())
+        {
+            return;
+        }
+
+        if ($config->deferred_count > 0)
+        {
+            if (!$config->deferred_commit_bulk)
+            {
+                if ($is_path)
+                    $config->deferred_paths[] = $path;
+                else
+                    $config->deferred_files[] = $path;
+            }
+            return;
+        }
+        $this->pendingChanges = true;
+        $this->pushSingeChange($path);
+    }
+
+    public function CommitChanges($bulk = false)
+    {
+        if (!$this->isInstalled())
+        {
+            return;
+        }
+
+        if ($this->deferred_count  > 0)
+        {
+            return;
+        }
+
+        if($bulk)
+        {
+            $flags = "x";
+            if ($this->csync_groups)
+            {
+                $flags .= ' -G '. join(',', $this->csync_groups);
+            }
+        }
+        else
+        {
+            if (!$this->pendingChanges)
+            {
+                return;
+            }
+            $flags = "ur" ;
+        }
+        $this->pendingChanges = false;
+        $this->pushBulkChanges($flags);
+    }
+
+    protected function pushSingeChange($path)
+    {
+        // csync2 directly inspects the argc passed to the process and ignores shell expansions, so escaping doesn't work
+        $flags = "cr" ;
+        if ($this->debug_mode && $this->debug_log)
+        {
+            $flags .= "v";
+        }
+        if ($this->csync_database)
+        {
+            $flags .= " -D ".$config->csync_database;
+        }
+        $input = $this->csync2_binary . " -".$flags." " . $path ." 2>&1";
+        $output = shell_exec($input);
+
+        if ($this->debug_mode && $this->debug_log)
+        {
+            file_put_contents($this->debug_log,generateCallTrace()."\n", FILE_APPEND);
+            file_put_contents($this->debug_log,$input."\n", FILE_APPEND);
+            file_put_contents($this->debug_log,$output."\n", FILE_APPEND);
+        }
+    }
+
+    protected function pushBulkChanges($flags)
+    {
+        if ($this->debug_mode && $this->debug_log)
+        {
+            $flags .= " -v";
+        }
+        if ($this->csync_database)
+        {
+            $flags .= " -D ".$this->csync_database;
+        }
+        $input = $this->csync2_binary . " -".$flags ." 2>&1";
+        $output = shell_exec($input);
+
+        if ($this->debug_mode && $this->debug_log)
+        {
+            file_put_contents($this->debug_log,generateCallTrace()."\n", FILE_APPEND);
+            file_put_contents($this->debug_log,$input."\n", FILE_APPEND);
+            file_put_contents($this->debug_log,$output."\n", FILE_APPEND);
+        }
+    }
+
 }

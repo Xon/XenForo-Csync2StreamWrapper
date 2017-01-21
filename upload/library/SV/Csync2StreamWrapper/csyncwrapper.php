@@ -34,13 +34,7 @@ class SV_Csync2StreamWrapper_csyncwrapper
 
     public static function RegisterStream()
     {
-        $config = SV_Csync2StreamWrapper_CsyncConfig::getInstance();
-
-        if ($config->isInstalled())
-            return;
-        $config->setInstalled(true);
-
-        stream_wrapper_register(static::prefix, "SV_Csync2StreamWrapper_csyncwrapper");
+        SV_Csync2StreamWrapper_CsyncConfig::getInstance()->RegisterStream();
     }
 
     protected static function absolutePath($path)
@@ -79,7 +73,7 @@ class SV_Csync2StreamWrapper_csyncwrapper
 
         return $path;
     }
-    protected static function ParsePath($path)
+    public static function ParsePath($path)
     {
         static $urls = array();
 
@@ -103,160 +97,22 @@ class SV_Csync2StreamWrapper_csyncwrapper
 
     public static function DeferrCommit(array $group_hints, $bulk_commit_hint = false)
     {
-        $config = SV_Csync2StreamWrapper_CsyncConfig::getInstance();
-        if (!$config->isInstalled())
-            return;
-
-        $config->deferred_count += 1;
-        $config->deferred_commit_bulk = $bulk_commit_hint;
-        if ($group_hints)
-        {
-            $config->csync_groups = $config->csync_groups + $group_hints;
-        }
-    }
-
-    public static function isTemp($path)
-    {
-        static $xfTemp = null;
-        if ($xfTemp === null)
-        {
-            $xfTemp = XenForo_Helper_File::getTempDir();
-            $xfTemp = static::ParsePath($xfTemp);
-        }
-        return !empty($xfTemp) && strpos($path, $xfTemp) !== false;
+        SV_Csync2StreamWrapper_CsyncConfig::getInstance()->DeferrCommit($group_hints, $bulk_commit_hint);
     }
 
     public static function FinalizeCommit()
     {
-        $config = SV_Csync2StreamWrapper_CsyncConfig::getInstance();
-        if (!$config->isInstalled())
-            return;
-
-        $config->deferred_count -= 1;
-        if ($config->deferred_count <= 0)
-        {
-            $config->deferred_count = 0;
-            if (!$config->deferred_commit_bulk)
-            {
-                $touched = array();
-                foreach($config->deferred_paths as &$dir)
-                {
-                    if (isset($touched[$dir]))
-                        continue;
-                    $touched[$dir] = true;
-                    static::ConsiderFileOrDir($dir, true);
-                }
-                $touched = array();
-                foreach($config->deferred_files as &$file)
-                {
-                    if (isset($touched[$file]))
-                        continue;
-                    $touched[$file] = true;
-                    static::ConsiderFileOrDir($file, false);
-                }
-            }
-            static::CommitChanges($config->deferred_commit_bulk);
-            $config->deferred_paths = array();
-            $config->deferred_files = array();
-        }
+        SV_Csync2StreamWrapper_CsyncConfig::getInstance()->FinalizeCommit();
     }
 
-    static $pendingChanges = false;
     protected static function ConsiderFileOrDir($path,$is_path)
     {
-        if (static::isTemp($path))
-        {
-            return;
-        }
-
-        $config = SV_Csync2StreamWrapper_CsyncConfig::getInstance();
-        if (!$config->isInstalled())
-            return;
-
-        if ($config->deferred_count > 0)
-        {
-            if (!$config->deferred_commit_bulk)
-            {
-                if ($is_path)
-                    $config->deferred_paths[] = $path;
-                else
-                    $config->deferred_files[] = $path;
-            }
-            return;
-        }
-        static::$pendingChanges = true;
-        static::pushSingeChange($path);
+        SV_Csync2StreamWrapper_CsyncConfig::getInstance()->ConsiderFileOrDir($path, $is_path);
     }
 
     protected static function CommitChanges($bulk = false)
     {
-        $config = SV_Csync2StreamWrapper_CsyncConfig::getInstance();
-        if (!$config->isInstalled())
-            return;
-
-        if ($config->deferred_count  > 0)
-            return;
-
-        if($bulk)
-        {
-            $flags = "x";
-            if ($config->csync_groups)
-            {
-                $flags .= ' -G '. join(',', $config->csync_groups);
-            }
-        }
-        else
-        {
-            if (!static::$pendingChanges)
-            {
-                return;
-            }
-            $flags = "ur" ;
-        }
-        static::$pendingChanges = false;
-        static::pushBulkChanges($flags);
-    }
-    
-    protected static function pushSingeChange($path)
-    {
-        $config = SV_Csync2StreamWrapper_CsyncConfig::getInstance();
-        // csync2 directly inspects the argc passed to the process and ignores shell expansions, so escaping doesn't work
-        $flags = "cr" ;
-        if ($config->debug_mode && $config->debug_log)
-            $flags .= "v";
-        if ($config->csync_database)
-            $flags .= " -D ".$config->csync_database;
-        $input = $config->csync2_binary . " -".$flags." " . $path ." 2>&1";
-        $output = shell_exec($input);
-
-        if ($config->debug_mode && $config->debug_log)
-        {
-            file_put_contents($config->debug_log,generateCallTrace()."\n", FILE_APPEND);
-            file_put_contents($config->debug_log,$input."\n", FILE_APPEND);
-            file_put_contents($config->debug_log,$output."\n", FILE_APPEND);
-        }
-    }
-    
-    protected static function pushBulkChanges($flags)
-    {
-        $config = SV_Csync2StreamWrapper_CsyncConfig::getInstance();
-        if ($config->debug_mode && $config->debug_log)
-        {
-            $flags .= " -v";
-        }
-        if ($config->csync_database)
-        {
-            $flags .= " -D ".$config->csync_database;
-        }
-        $input = $config->csync2_binary . " -".$flags ." 2>&1";
-        $output = shell_exec($input);
-
-        if ($config->debug_mode && $config->debug_log)
-        {
-            file_put_contents($config->debug_log,generateCallTrace()."\n", FILE_APPEND);
-            file_put_contents($config->debug_log,$input."\n", FILE_APPEND);
-            file_put_contents($config->debug_log,$output."\n", FILE_APPEND);
-        }
+        SV_Csync2StreamWrapper_CsyncConfig::getInstance()->CommitChanges($bulk);
     }
 
     function __construct ( )
