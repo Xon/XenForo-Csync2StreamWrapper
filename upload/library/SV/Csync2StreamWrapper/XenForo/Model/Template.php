@@ -120,4 +120,30 @@ class SV_Csync2StreamWrapper_XenForo_Model_Template extends XFCP_SV_Csync2Stream
             SV_Csync2StreamWrapper_csyncwrapper::FinalizeCommit();
         }
     }
+
+    public function reparseNamedTemplates(array $templates, $maxExecution = 0, $startStyle = 0)
+    {
+        SV_Csync2StreamWrapper_csyncwrapper::DeferrCommit([SV_Csync2StreamWrapper_CsyncConfig::getInstance()->www_templates], true);
+        try
+        {
+            return parent::reparseNamedTemplates($templates, $maxExecution, $startStyle);
+        }
+        finally
+        {
+            SV_Csync2StreamWrapper_csyncwrapper::FinalizeCommit();
+        }
+    }
+
+    public function compileNamedTemplates(array $templates, $maxExecution = 0, $startStyle = 0)
+    {
+        SV_Csync2StreamWrapper_csyncwrapper::DeferrCommit([SV_Csync2StreamWrapper_CsyncConfig::getInstance()->www_templates], true);
+        try
+        {
+            return parent::compileNamedTemplates($templates, $maxExecution, $startStyle);
+        }
+        finally
+        {
+            SV_Csync2StreamWrapper_csyncwrapper::FinalizeCommit();
+        }
+    }
 }
