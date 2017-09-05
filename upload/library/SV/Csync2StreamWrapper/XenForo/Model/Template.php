@@ -121,12 +121,12 @@ class SV_Csync2StreamWrapper_XenForo_Model_Template extends XFCP_SV_Csync2Stream
         }
     }
 
-    public function reparseNamedTemplates(array $templates, $maxExecution = 0, $startStyle = 0)
+    public function reparseNamedTemplates(array $templates, $maxExecution = 0, $startStyle = 0, $lastTemplate = null)
     {
         SV_Csync2StreamWrapper_csyncwrapper::DeferrCommit([SV_Csync2StreamWrapper_CsyncConfig::getInstance()->www_templates], true);
         try
         {
-            return parent::reparseNamedTemplates($templates, $maxExecution, $startStyle);
+            return parent::reparseNamedTemplates($templates, $maxExecution, $startStyle, $lastTemplate);
         }
         finally
         {
@@ -134,12 +134,12 @@ class SV_Csync2StreamWrapper_XenForo_Model_Template extends XFCP_SV_Csync2Stream
         }
     }
 
-    public function compileNamedTemplates(array $templates, $maxExecution = 0, $startStyle = 0)
+    public function compileNamedTemplates(array $templates, $maxExecution = 0, $startStyle = 0, $startTemplate = null)
     {
         SV_Csync2StreamWrapper_csyncwrapper::DeferrCommit([SV_Csync2StreamWrapper_CsyncConfig::getInstance()->www_templates], true);
         try
         {
-            return parent::compileNamedTemplates($templates, $maxExecution, $startStyle);
+            return parent::compileNamedTemplates($templates, $maxExecution, $startStyle, $startTemplate);
         }
         finally
         {
