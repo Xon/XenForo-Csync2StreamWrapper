@@ -10,19 +10,19 @@ class SV_Csync2StreamWrapper_CsyncConfig
     }
 
 
-    public $deferred_count = 0;
+    public $deferred_count       = 0;
     public $deferred_commit_bulk = false;
-    public $deferred_paths = array();
-    public $deferred_files =  array();
-    public $csync2_binary = "/usr/sbin/csync2";
-    public $csync_database = ""; //= "/var/lib/csync2";
+    public $deferred_paths       = [];
+    public $deferred_files       = [];
+    public $csync2_binary        = "/usr/sbin/csync2";
+    public $csync_database       = ""; //= "/var/lib/csync2";
 
     public $debug_mode = false;
-    public $debug_log = "";// = "/var/www/html/error.log";
+    public $debug_log  = "";// = "/var/www/html/error.log";
 
-    public $csync_groups = array('www_code', 'www_data', 'www_templates');
-    public $www_code = 'www_code';
-    public $www_data = 'www_data';
+    public $csync_groups  = ['www_code', 'www_data', 'www_templates'];
+    public $www_code      = 'www_code';
+    public $www_data      = 'www_data';
     public $www_templates = 'www_templates';
 
     protected $_installed = false;
@@ -83,6 +83,7 @@ class SV_Csync2StreamWrapper_CsyncConfig
             $xfTemp = XenForo_Helper_File::getTempDir();
             $xfTemp = SV_Csync2StreamWrapper_csyncwrapper::ParsePath($xfTemp);
         }
+
         return !empty($xfTemp) && strpos($path, $xfTemp) !== false;
     }
 
@@ -99,31 +100,36 @@ class SV_Csync2StreamWrapper_CsyncConfig
             $this->deferred_count = 0;
             if (!$this->deferred_commit_bulk)
             {
-                $touched = array();
-                foreach($this->deferred_paths as &$dir)
+                $touched = [];
+                foreach ($this->deferred_paths as &$dir)
                 {
                     if (isset($touched[$dir]))
+                    {
                         continue;
+                    }
                     $touched[$dir] = true;
                     $this->ConsiderFileOrDir($dir, true);
                 }
-                $touched = array();
-                foreach($this->deferred_files as &$file)
+                $touched = [];
+                foreach ($this->deferred_files as &$file)
                 {
                     if (isset($touched[$file]))
+                    {
                         continue;
+                    }
                     $touched[$file] = true;
                     $this->ConsiderFileOrDir($file, false);
                 }
             }
             $this->CommitChanges($this->deferred_commit_bulk);
-            $this->deferred_paths = array();
-            $this->deferred_files = array();
+            $this->deferred_paths = [];
+            $this->deferred_files = [];
         }
     }
 
     protected $pendingChanges = false;
-    public function ConsiderFileOrDir($path,$is_path)
+
+    public function ConsiderFileOrDir($path, $is_path)
     {
         if ($this->isTemp($path))
         {
@@ -147,6 +153,7 @@ class SV_Csync2StreamWrapper_CsyncConfig
                     $this->deferred_files[] = $path;
                 }
             }
+
             return;
         }
         $this->pendingChanges = true;
@@ -160,17 +167,17 @@ class SV_Csync2StreamWrapper_CsyncConfig
             return;
         }
 
-        if ($this->deferred_count  > 0)
+        if ($this->deferred_count > 0)
         {
             return;
         }
 
-        if($bulk)
+        if ($bulk)
         {
             $flags = "x";
             if ($this->csync_groups)
             {
-                $flags .= ' -G '. join(',', $this->csync_groups);
+                $flags .= ' -G ' . join(',', $this->csync_groups);
             }
         }
         else
@@ -179,7 +186,7 @@ class SV_Csync2StreamWrapper_CsyncConfig
             {
                 return;
             }
-            $flags = "ur" ;
+            $flags = "ur";
         }
         $this->pendingChanges = false;
         $this->pushBulkChanges($flags);
@@ -188,23 +195,23 @@ class SV_Csync2StreamWrapper_CsyncConfig
     protected function pushSingeChange($path)
     {
         // csync2 directly inspects the argc passed to the process and ignores shell expansions, so escaping doesn't work
-        $flags = "cr" ;
+        $flags = "cr";
         if ($this->debug_mode && $this->debug_log)
         {
             $flags .= "v";
         }
         if ($this->csync_database)
         {
-            $flags .= " -D ".$this->csync_database;
+            $flags .= " -D " . $this->csync_database;
         }
-        $input = $this->csync2_binary . " -".$flags." " . $path ." 2>&1";
+        $input = $this->csync2_binary . " -" . $flags . " " . $path . " 2>&1";
         $output = shell_exec($input);
 
         if ($this->debug_mode && $this->debug_log)
         {
-            file_put_contents($this->debug_log,generateCallTrace()."\n", FILE_APPEND);
-            file_put_contents($this->debug_log,$input."\n", FILE_APPEND);
-            file_put_contents($this->debug_log,$output."\n", FILE_APPEND);
+            file_put_contents($this->debug_log, generateCallTrace() . "\n", FILE_APPEND);
+            file_put_contents($this->debug_log, $input . "\n", FILE_APPEND);
+            file_put_contents($this->debug_log, $output . "\n", FILE_APPEND);
         }
     }
 
@@ -216,17 +223,16 @@ class SV_Csync2StreamWrapper_CsyncConfig
         }
         if ($this->csync_database)
         {
-            $flags .= " -D ".$this->csync_database;
+            $flags .= " -D " . $this->csync_database;
         }
-        $input = $this->csync2_binary . " -".$flags ." 2>&1";
+        $input = $this->csync2_binary . " -" . $flags . " 2>&1";
         $output = shell_exec($input);
 
         if ($this->debug_mode && $this->debug_log)
         {
-            file_put_contents($this->debug_log,generateCallTrace()."\n", FILE_APPEND);
-            file_put_contents($this->debug_log,$input."\n", FILE_APPEND);
-            file_put_contents($this->debug_log,$output."\n", FILE_APPEND);
+            file_put_contents($this->debug_log, generateCallTrace() . "\n", FILE_APPEND);
+            file_put_contents($this->debug_log, $input . "\n", FILE_APPEND);
+            file_put_contents($this->debug_log, $output . "\n", FILE_APPEND);
         }
     }
-
 }

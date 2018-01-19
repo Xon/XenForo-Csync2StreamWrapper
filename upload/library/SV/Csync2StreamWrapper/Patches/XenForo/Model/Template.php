@@ -14,7 +14,7 @@ class SV_Csync2StreamWrapper_Patches_XenForo_Model_Template extends XFCP_SV_Csyn
             {
                 $oldContents = @file_get_contents($filename);
             }
-            catch(Exception $e)
+            catch (Exception $e)
             {
                 $oldContents = false;
             }
@@ -36,4 +36,9 @@ class SV_Csync2StreamWrapper_Patches_XenForo_Model_Template extends XFCP_SV_Csyn
             $options->set('templateFiles', true);
         }
     }
+}
+
+if (false)
+{
+    class XFCP_SV_Csync2StreamWrapper_Patches_XenForo_Model_Template extends XenForo_Model_Template {}
 }

@@ -28,11 +28,25 @@ class SV_Csync2StreamWrapper_XenForo_Model_AddOn extends XFCP_SV_Csync2StreamWra
         }
     }
 
+    protected function _recursiveCopy(AddOnInstaller_Model_Deployment_Abstract $deployer, $source, $destination, array &$failedFiles)
+    {
+        SV_Csync2StreamWrapper_csyncwrapper::DeferrCommit([SV_Csync2StreamWrapper_CsyncConfig::getInstance()->www_code], true);
+        try
+        {
+            return parent::_recursiveCopy($deployer, $source, $destination, $failedFiles);
+        }
+        finally
+        {
+            SV_Csync2StreamWrapper_csyncwrapper::FinalizeCommit();
+        }
+    }
+
     public function recursiveCopy($source, $destination)
     {
         SV_Csync2StreamWrapper_csyncwrapper::DeferrCommit([SV_Csync2StreamWrapper_CsyncConfig::getInstance()->www_code], true);
         try
         {
+            /** @noinspection PhpUndefinedMethodInspection */
             return parent::recursiveCopy($source, $destination);
         }
         finally
@@ -118,4 +132,9 @@ class SV_Csync2StreamWrapper_XenForo_Model_AddOn extends XFCP_SV_Csync2StreamWra
             SV_Csync2StreamWrapper_csyncwrapper::FinalizeCommit();
         }
     }
+}
+
+if (false)
+{
+    class XFCP_SV_Csync2StreamWrapper_XenForo_Model_AddOn extends AddOnInstaller_XenForo_Model_AddOn {}
 }

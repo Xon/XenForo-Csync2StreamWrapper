@@ -41,3 +41,8 @@ class SV_Csync2StreamWrapper_XenForo_ControllerAdmin_AddOn extends XFCP_SV_Csync
         }
     }
 }
+
+if (false)
+{
+    class XFCP_SV_Csync2StreamWrapper_XenForo_ControllerAdmin_AddOn extends AddOnInstaller_XenForo_ControllerAdmin_AddOn {}
+}

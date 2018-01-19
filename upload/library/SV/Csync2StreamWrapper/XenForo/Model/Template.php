@@ -42,7 +42,7 @@ class SV_Csync2StreamWrapper_XenForo_Model_Template extends XFCP_SV_Csync2Stream
         }
     }
 
-    public function importTemplatesStyleXml(SimpleXMLElement $xml, $styleId, $addOnId = null )
+    public function importTemplatesStyleXml(SimpleXMLElement $xml, $styleId, $addOnId = null)
     {
         SV_Csync2StreamWrapper_csyncwrapper::DeferrCommit([SV_Csync2StreamWrapper_CsyncConfig::getInstance()->www_templates], true);
         try
@@ -146,4 +146,9 @@ class SV_Csync2StreamWrapper_XenForo_Model_Template extends XFCP_SV_Csync2Stream
             SV_Csync2StreamWrapper_csyncwrapper::FinalizeCommit();
         }
     }
+}
+
+if (false)
+{
+    class XFCP_SV_Csync2StreamWrapper_XenForo_Model_Template extends AddOnInstaller_XenForo_Model_Template {}
 }

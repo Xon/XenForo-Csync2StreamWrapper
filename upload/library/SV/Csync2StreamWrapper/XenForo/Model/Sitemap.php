@@ -42,5 +42,9 @@ class SV_Csync2StreamWrapper_XenForo_Model_Sitemap extends XFCP_SV_Csync2StreamW
             SV_Csync2StreamWrapper_csyncwrapper::FinalizeCommit();
         }
     }
+}
 
+if (false)
+{
+    class XFCP_SV_Csync2StreamWrapper_XenForo_Model_Sitemap extends XenForo_Model_Sitemap {}
 }
